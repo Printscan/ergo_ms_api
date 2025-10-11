@@ -24,7 +24,7 @@ class PermissionMark(models.Model):
 
 class Object_Type(models.Model):
     name = models.CharField(max_length=100, default='')
-    
+
 class Object(models.Model):
     objectlink = models.CharField(max_length=255, default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -35,7 +35,7 @@ class GroupCategory(models.Model):
 
 class ExpandedPermission(models.Model):
     permission = models.OneToOneField(Permission, on_delete=models.CASCADE)
-    permission_mark = models.ForeignKey(PermissionMark, on_delete=models.CASCADE)   
+    permission_mark = models.ForeignKey(PermissionMark, on_delete=models.CASCADE)
     group_category = models.ForeignKey(GroupCategory, on_delete=models.CASCADE)
 
 class CMSPage(models.Model):
