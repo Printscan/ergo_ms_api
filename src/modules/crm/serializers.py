@@ -100,9 +100,11 @@ class ProjectSerializer(serializers.ModelSerializer):
     task_count = serializers.SerializerMethodField()
     completed_task_count = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    planned_results = serializers.SerializerMethodField()
     
     class Meta:
         model = Project
+        ref_name = "CRMProject"
         fields = [
             'id', 'name', 'description', 'planned_results', 'owner', 'manager', 'manager_id',
             'memberships', 'status', 'priority', 'start_date', 'end_date',
@@ -135,6 +137,20 @@ class ProjectSerializer(serializers.ModelSerializer):
         completed = self.get_completed_task_count(obj)
         return round((completed / total) * 100)
     
+    def get_planned_results(self, obj):
+        """���������� ����������� ����������, ���� ��� ��������� в объекте."""
+        value = getattr(obj, 'planned_results', None)
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return value
+        if hasattr(value, 'values'):
+            try:
+                return list(value.values())
+            except TypeError:
+                pass
+        return value
+    
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
         return super().create(validated_data)
@@ -156,6 +172,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
     task_count = serializers.SerializerMethodField()
     completed_task_count = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
+    planned_results = serializers.SerializerMethodField()
     
     class Meta:
         model = Project
@@ -189,6 +206,19 @@ class ProjectListSerializer(serializers.ModelSerializer):
         
         completed = self.get_completed_task_count(obj)
         return round((completed / total) * 100)
+    
+    def get_planned_results(self, obj):
+        value = getattr(obj, 'planned_results', None)
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return value
+        if hasattr(value, 'values'):
+            try:
+                return list(value.values())
+            except TypeError:
+                pass
+        return value
 
 
 class TaskCommentSerializer(serializers.ModelSerializer):

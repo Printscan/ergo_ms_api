@@ -49,7 +49,10 @@ class VideoAnalysisViewSet(SwaggerSafeMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         base_queryset = VideoAnalysis.objects.all()
         user = self.get_safe_user()
-        logger.debug(f"Получение queryset для пользователя {user.username} (ID: {user.id})")
+        if user is None:
+            logger.debug("Swagger schema generation: return empty queryset for video analysis")
+            return self.get_safe_queryset(base_queryset)
+        logger.debug("Получение queryset для пользователя %s (ID: %s)", user.username, user.id)
         return self.get_safe_queryset(base_queryset.filter(user=user))
     
     def list(self, request, *args, **kwargs):
